@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediGrid AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <style>
+        /* --- VARIABLES & RESET --- */
+        :root {
+            --bg-color: #ffffff;
+            --sidebar-bg: #f8f9fb;
+            --primary-color: #2db5b0; /*#ff4b4b*/
+            --teal-color: #00838f; 
+            --blue-btn: #2196f3; 
+            --cyan-btn: #00acc1;
+            --text-color: #262730;
+            --border-color: #e0e0e0;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Source Sans Pro', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 300px;
+            background-color: var(--sidebar-bg);
+            padding: 3rem 1.5rem;
+            height: 100%;
+            border-right: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            flex-shrink: 0;
+        }
+        .sidebar-title { font-size: 1.5rem; font-weight: 700; color: #262730; display: flex; align-items: center; gap: 0.5rem; }
+        .sidebar h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: #444; }
+        .info-box { background: #e3f2fd; color: #0d47a1; padding: 1rem; border-radius: 6px; font-size: 0.9rem; margin-bottom: 1rem; }
+        .location-btn { 
+            background: var(--blue-btn); color: white; border: none; width: 100%; padding: 0.8rem; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;
+        }
+        .location-btn:hover { opacity: 0.9; }
+        .location-btn.active { background-color: #2e7d32; } 
+
+        /* --- MAIN CONTENT CONTAINER --- */
+        .main-content {
+            flex: 1;
+            padding: 1rem 4rem;
+            overflow-y: auto;
+            position: relative;
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- TOP SECTION --- */
+        .top-section { margin-bottom: 2rem; text-align: center; }
+        .hero-title { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; color: #262730; }
+        .sub-header { color: #666; margin-bottom: 1.5rem; }
+
+        .upload-zone {
+            border: 2px dashed #00acc1;
+            background: #f0f8ff;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 1rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .upload-zone:hover { background: #e0f7fa; border-color: #00838f; }
+        .upload-content { display: flex; align-items: center; justify-content: center; gap: 1rem; color: #555; }
+        .browse-btn { background: white; border: 1px solid #ccc; padding: 8px 16px; border-radius: 4px; font-weight: 600; cursor: pointer; }
+
+        .full-width-btn {
+            background: var(--cyan-btn); color: white; border: none; padding: 12px; width: 100%; max-width: 800px; border-radius: 6px; font-weight: 600; cursor: pointer; margin: 0 auto; display: block;
+        }
+
+        /* --- WAITING STATE --- */
+        .waiting-state { text-align: center; color: #999; margin-top: 3rem; transition: opacity 0.3s; }
+        .waiting-state h3 { font-size: 1.5rem; margin-bottom: 0.5rem; color: #bbb; display: flex; align-items: center; justify-content: center; gap: 10px; }
+
+        /* --- RESULTS --- */
+        .results-container {
+            display: none; 
+            border-top: 1px solid #eee;
+            padding-top: 2rem;
+            height: 100%;
+            animation: slideUp 0.4s ease;
+            padding-bottom: 80px; 
+        }
+
+        .split-layout { display: flex; gap: 2rem; height: 500px; }
+        .col-header { font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; color: #333; display: flex; align-items: center; gap: 8px; }
+
+        /* Left: Source Image */
+        .left-col { flex: 1; display: flex; flex-direction: column; min-width: 350px; }
+        .img-viewer { 
+            flex: 1; background: #222; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            position: relative; cursor: zoom-in;
+        }
+        .img-viewer img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform 0.3s; }
+        .img-viewer:hover img { transform: scale(1.02); }
+        .zoom-hint { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.6); color: white; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; pointer-events: none; }
+
+        /* Right: Analysis Tab */
+        .right-col { 
+            flex: 1.2; background: white; border: 1px solid #eee; border-radius: 8px; display: flex; flex-direction: column; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+        }
+
+        .panel-nav { display: flex; border-bottom: 1px solid #eee; padding: 0 1rem; background: #fafafa; border-radius: 8px 8px 0 0; }
+        .nav-btn { background: none; border: none; padding: 1rem; font-weight: 600; color: #666; cursor: pointer; border-bottom: 3px solid transparent; }
+        .nav-btn.active { color: var(--primary-color); border-bottom-color: var(--primary-color); background: white; }
+        
+        .panel-content { flex: 1; padding: 1.5rem; overflow-y: auto; }
+        
+        .loader-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; border-radius: 8px; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; }
+        th { text-align: left; padding: 10px; background: #f9f9f9; color: #555; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        .patient-card { background: #f5f5f5; padding: 1rem; border-radius: 6px; display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 1rem; font-size: 0.9rem; }
+
+        /* --- FULLSCREEN --- */
+        .fullscreen-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 5000; display: none;
+            align-items: center; justify-content: center; cursor: zoom-out;
+        }
+        .fullscreen-overlay img { max-width: 90%; max-height: 90%; object-fit: contain; }
+        .fullscreen-close { position: absolute; top: 20px; right: 30px; color: white; font-size: 40px; cursor: pointer; }
+
+        /* --- MODAL --- */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 5% auto; padding: 2rem; width: 80%; max-height: 80vh; overflow-y: auto; border-radius: 8px; position: relative; }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: #666; }
+
+        /* --- CHAT --- */
+        .chat-widget-btn { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background-color: var(--primary-color); color: white; border-radius: 50%; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2000; transition: transform 0.2s; }
+        .chat-widget-btn:hover { transform: scale(1.1); }
+        .chat-popup { position: fixed; bottom: 100px; right: 25px; width: 350px; height: 500px; background-color: white; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); display: flex; flex-direction: column; z-index: 1999; overflow: hidden; border: 1px solid #eee; opacity: 0; pointer-events: none; transform: translateY(20px); transition: all 0.3s ease; }
+        .chat-popup.active { opacity: 1; pointer-events: auto; transform: translateY(0); }
+        .chat-header { background: var(--primary-color); color: white; padding: 1rem; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+        .chat-body { flex: 1; padding: 1rem; overflow-y: auto; background-color: #f9f9f9; display: flex; flex-direction: column; gap: 10px; }
+        .chat-footer { padding: 0.8rem; border-top: 1px solid #eee; background-color: white; display: flex; gap: 0.5rem; }
+        .chat-input { flex: 1; border: 1px solid #ddd; border-radius: 20px; padding: 8px 15px; outline: none; }
+        .msg { padding: 8px 12px; border-radius: 15px; max-width: 85%; font-size: 0.9rem; line-height: 1.4; }
+        .msg.bot { background: #e8f0fe; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .msg.user { background: var(--primary-color); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+
+        .toast { position: fixed; top: 20px; right: 20px; background: #333; color: white; padding: 12px 20px; border-radius: 4px; animation: fadeIn 0.3s; z-index: 3000; }
+        .hidden { display: none; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <input type="hidden" id="apiUrl" value="http://127.0.0.1:8000/data_extraction">
+    <input type="file" id="hiddenFileInput" accept="image/*" style="display:none;">
+
+    <div class="sidebar">
+        <div class="sidebar-title">✚ MediGrid AI</div>
+        
+        <div>
+            <h3>📍 Location Service</h3>
+            <div class="info-box">Click below to enable location services</div>
+            <button type="button" class="location-btn" id="locBtn" onclick="requestRealLocation()">
+                <span class="material-icons">my_location</span> Find Nearby
+            </button>
+        </div>
+
+        <div>
+            <h3>📘 User Guide</h3>
+            <div class="info-box" style="background:none; border:1px solid #7ea2a3; color:#555;">
+                1. Enable location (must for nearby pharmacies).<br>
+                2. Upload a prescription image.<br>
+                3. AI extracts medicines clearly.<br>
+                4. Download report
+                5. Save to Database for chat with ai assistant.
+            </div>
+            <h3>ℹ️ Desclimer</h3>
+            <div class="info-box" style="background:none; border:1px solid #ffffff; color:#555;">
+                This AI Application provide informational support only and do not substitute for professional medical advice, diagnosis, or treatment.”.<br>
+                
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+
+        <div class="top-section">
+            <div class="hero-title">✚ MediGrid AI</div>
+            <div class="sub-header">Transform handwritten tablets prescriptions into digital medical insights.</div>
+
+            <div class="upload-zone" onclick="triggerUpload()">
+                <div class="upload-content">
+                    <span class="material-icons" style="font-size: 2rem; color: #ccc;">cloud_upload</span>
+                    <div>
+                        <div style="font-weight:600; color:#333;">Drag and drop file here</div>
+                        <div style="font-size:0.8rem; color:#888; margin-top:5px;">Limit 200MB • PNG, JPG, JPEG</div>
+                    </div>
+                    <button class="browse-btn">Upload files</button>
+                </div>
+            </div>
+            
+            <button type="button" class="full-width-btn" onclick="toggleHistory()">View History</button>
+        </div>
+
+        <div id="waitingState" class="waiting-state">
+            <h3>👋 Waiting for upload...</h3>
+            <p>Please upload a prescription image to view the analysis dashboard.</p>
+        </div>
+
+        <div id="resultsContainer" class="results-container">
+            <div class="split-layout">
+                
+                <div class="left-col">
+                    <div class="col-header"><span class="material-icons" style="color:#00acc1">image</span> Source Images</div>
+                    <div class="img-viewer" onclick="openFullscreen()">
+                        <img id="dashboardImg" src="" alt="Source Prescription">
+                        <div class="zoom-hint"><span class="material-icons" style="font-size:0.8rem; vertical-align:middle;">zoom_in</span> Click to Zoom</div>
+                    </div>
+                </div>
+
+                <div class="right-col">
+                    <div class="col-header" style="padding: 0 1rem; margin-top: 1rem;"><span class="material-icons" style="color:#ff4b4b">analytics</span> Analysis Tab</div>
+
+                    <div class="loader-overlay" id="dashboardLoader">
+                        <div class="spinner"></div>
+                        <p style="margin-top:10px; font-weight:600; color:#555;">Analyzing Prescription...</p>
+                    </div>
+
+                    <div class="panel-nav">
+                        <button class="nav-btn active" onclick="switchTab('tabData', this)">📄 Extracted Data</button>
+                        <button class="nav-btn" onclick="switchTab('tabWarn', this)">⚠️ Critical Warnings</button>
+                    </div>
+
+                    <div id="tabData" class="panel-content">
+                        <div class="patient-card" id="patientData">Loading...</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Medication</th>
+                                    <th>Dosage</th>
+                                    <th>Freq</th>
+                                    <th>Duration</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="medTable"></tbody>
+                        </table>
+                    </div>
+
+                    <div id="tabWarn" class="panel-content hidden">
+                        <div id="warningList"></div>
+                    </div>
+                    
+                    <div style="padding:1rem; border-top:1px solid #eee; display:flex; gap:10px; justify-content:flex-end;">
+                         <button type="button" class="browse-btn" onclick="downloadText()">Download Report (.txt)</button>
+                         <button type="button" class="location-btn" style="width:auto; background:#2e7d32;" onclick="saveToDb(event)">Save to DB</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <button class="chat-widget-btn" onclick="toggleChat()">
+        <span class="material-icons" style="font-size: 28px;">support_agent</span>
+    </button>
+    <div class="chat-popup" id="chatPopup">
+        <div class="chat-header">
+            <span>🤖 MediAI Support Assistant</span>
+            <span class="material-icons" style="cursor:pointer" onclick="toggleChat()">close</span>
+        </div>
+        <div class="chat-body" id="chatBox">
+            <div class="msg bot">Hello! I am your MediGrid assistant. How can I help you with this prescription?</div>
+        </div>
+        <div class="chat-footer">
+            <input type="text" id="chatInput" class="chat-input" placeholder="Ask a question...">
+            <button onclick="sendChat()" style="background:var(--primary-color); color:white; border:none; border-radius:50%; width:35px; height:35px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                <span class="material-icons" style="font-size:16px;">send</span>
+            </button>
+        </div>
+    </div>
+
+    <div id="fullscreenOverlay" class="fullscreen-overlay" onclick="closeFullscreen()">
+        <span class="fullscreen-close">×</span>
+        <img id="fullscreenImg" src="">
+    </div>
+
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="toggleHistory()">×</span>
+            <h2>📜 Database History</h2>
+            <div style="overflow-x:auto;">
+                <table id="historyTable" style="margin-top:20px;">
+                    <thead><tr id="historyHeader"></tr></thead>
+                    <tbody id="historyBody"></tbody>
+                </table>
+            </div>
+            <p id="historyLoading" style="text-align:center; color:#666;">Loading data...</p>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('hiddenFileInput');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const waitingState = document.getElementById('waitingState');
+        const dashboardImg = document.getElementById('dashboardImg');
+        const loader = document.getElementById('dashboardLoader');
+        const apiUrl = document.getElementById('apiUrl').value;
+        let currentData = null;
+        let userCoordinates = null;
+
+        function triggerUpload() { fileInput.click(); }
+
+        // --- LOCATION ---
+        function requestRealLocation() {
+            if (!navigator.geolocation) { alert("Geolocation not supported."); return; }
+            const btn = document.getElementById('locBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="material-icons spin">refresh</span> Requesting...';
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    const { latitude: lat, longitude: lng } = pos.coords;
+                    userCoordinates = { latitude: lat, longitude: lng };
+                    btn.innerHTML = '<span class="material-icons">check_circle</span> Location Saved';
+                    btn.classList.add('active');
+                    showToast(`📍 Location Acquired `);  //${lat.toFixed(2)}, ${lng.toFixed(2)}
+                },
+                (err) => { alert("Permission denied."); btn.innerHTML = originalText; }
+            );
+        }
+
+        // --- UPLOAD ---
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // HIDE Waiting State, SHOW Results
+            waitingState.style.display = 'none';
+            resultsContainer.style.display = 'block';
+            
+            dashboardImg.src = URL.createObjectURL(file);
+            loader.style.display = 'flex';
+            switchTab('tabData', document.querySelector('.nav-btn'));
+            
+            const formData = new FormData();
+            formData.append('image', file);
+            if (userCoordinates) formData.append('user_location', JSON.stringify(userCoordinates));
+
+            try {
+                const res = await fetch(apiUrl, { method:'POST', body: formData });
+                if(!res.ok) throw new Error("Server Error");
+                const data = await res.json();
+                currentData = data;
+
+                renderDashboard(data);
+                loader.style.display = 'none';
+                showToast("✅ Analysis Completed");
+                fetchWarnings(data);
+
+            } catch(err) {
+                alert("Analysis Failed :Give Location Permission to Analyze  " + err.message);
+                loader.style.display = 'none';
+            }
+        });
+
+        // --- RENDER ---
+        function renderDashboard(data) {
+            const p = data.patient_info || {};
+            const name = p.patient_name || p.Name || 'Unknown';
+            const age = p.age || p.Age || '--';
+            const date = p.Date || '--';
+
+            document.getElementById('patientData').innerHTML = `
+                <span>👤 ${name}</span><span>📅 ${date}</span><span>🎂 ${age}</span>
+            `;
+
+            const tbody = document.getElementById('medTable');
+            tbody.innerHTML = '';
+            (data.Prescription_info || []).forEach(m => {
+                const dur = m.Duration || m.duration || 'Not provided';
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="font-weight:600; color:#0d47a1;">${m.medications}</td>
+                        <td>${m.Dosage}</td><td>${m.Frequency}</td><td>${dur}</td>
+                        <td><a href="${m.Map_link}" target="_blank" style="color:#c62828; text-decoration:none;">📍 Map</a></td>
+                    </tr>`;
+            });
+        }
+
+        // --- WARNINGS ---
+        async function fetchWarnings(data) {
+            try {
+                const cleanData = JSON.parse(JSON.stringify(data));
+                if (cleanData.Prescription_info) {
+                    cleanData.Prescription_info = cleanData.Prescription_info.map(item => ({
+                        medications: item.medications,
+                        Dosage: item.Dosage,
+                        Frequency: item.Frequency,
+                        Duration: item.Duration || item.duration || "Not provided",
+                        Map_link: item.Map_link
+                    }));
+                }
+
+                const url = apiUrl.replace('data_extraction', 'critical_warnings');
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(cleanData)
+                });
+                
+                const warnings = await res.json();
+                const div = document.getElementById('warningList');
+                div.innerHTML = '';
+
+                if (warnings.detail) {
+                   div.innerHTML = `<div style="color:red; padding:10px;">Backend Validation Error: ${JSON.stringify(warnings.detail)}</div>`;
+                   return;
+                }
+                
+                if(!warnings || warnings.length === 0) {
+                    div.innerHTML = '<div style="color:green; padding:10px; background:#e8f5e9;">✅ No critical warnings.</div>';
+                } else {
+                    let list = Array.isArray(warnings) ? warnings : [JSON.stringify(warnings)];
+                    list.forEach(w => {
+                        let cleanW = w.trim();
+                        if (!cleanW) return;
+                        if (cleanW.startsWith('-')) cleanW = cleanW.substring(1).trim();
+                        cleanW = cleanW.replace(/\[(.*?)\]/g, '<strong style="color:#d32f2f;">[$1]</strong>');
+                        div.innerHTML += `<div style="padding:10px; background:#fff3e0; border-left:4px solid #ff9800; margin-bottom:5px; border-radius:4px;">${cleanW}</div>`;
+                    });
+                    showToast("⚠️ Warnings Found");
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        // --- FIXED: SAVE TO DB (Prevent Reload) ---
+        function saveToDb(event) {
+             // THIS PREVENTS THE PAGE RELOAD
+             if(event) event.preventDefault();
+
+             const payload = {
+                 patient_info: currentData.patient_info,
+                 Prescription_info: currentData.Prescription_info.map(item => ({
+                        medications: item.medications,
+                        Dosage: item.Dosage,
+                        Frequency: item.Frequency,
+                        Duration: item.Duration || item.duration || "Not provided",
+                        Map_link: item.Map_link
+                 }))
+             };
+
+             fetch("http://127.0.0.1:8000/post_into_db", { 
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify(payload) 
+             })
+             .then(res => {
+                 if(res.ok) showToast("💾 Saved to Database");
+                 else showToast("❌ Save Failed");
+             });
+        }
+
+        // --- HISTORY, FULLSCREEN, UTILS ---
+        async function toggleHistory() {
+            const modal = document.getElementById('historyModal');
+            modal.style.display = (modal.style.display === 'block') ? 'none' : 'block';
+            if (modal.style.display === 'block') {
+                const body = document.getElementById('historyBody');
+                const head = document.getElementById('historyHeader');
+                document.getElementById('historyLoading').style.display='block';
+                body.innerHTML = ''; head.innerHTML = '';
+                try {
+                    const res = await fetch("http://127.0.0.1:8000/get_Saved_data");
+                    const json = await res.json();
+                    const data = typeof json === 'string' ? JSON.parse(json) : json;
+                    document.getElementById('historyLoading').style.display='none';
+                    if (!data || data.length === 0) { body.innerHTML = '<tr><td>No history.</td></tr>'; return; }
+                    const keys = Object.keys(data[0]);
+                    keys.forEach(k => head.innerHTML += `<th>${k}</th>`);
+                    data.forEach(r => {
+                        let tr = '<tr>'; keys.forEach(k => tr += `<td>${r[k]}</td>`); tr += '</tr>'; body.innerHTML += tr;
+                    });
+                } catch(e) { document.getElementById('historyLoading').innerText = "Error loading history"; }
+            }
+        }
+        window.onclick = function(e) { if(e.target == document.getElementById('historyModal')) toggleHistory(); }
+
+        function openFullscreen() {
+            const src = document.getElementById('dashboardImg').src;
+            if(src) { document.getElementById('fullscreenImg').src = src; document.getElementById('fullscreenOverlay').style.display='flex'; }
+        }
+        function closeFullscreen() { document.getElementById('fullscreenOverlay').style.display='none'; }
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.panel-content').forEach(d => d.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            if(btn) btn.classList.add('active');
+        }
+
+        function showToast(msg) {
+            const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+            document.body.appendChild(t); setTimeout(() => t.remove(), 3000);
+        }
+
+        function downloadText() {
+            if(!currentData) return;
+            let text = "MEDIGRID AI REPORT\n";
+            text += "==============================================================================\n";
+            const p = currentData.patient_info || {};
+            text += `Patient Name: ${p.patient_name || p.Name || 'N/A'}\n`;
+            text += `Age:          ${p.age || p.Age || 'N/A'}\n`;
+            text += `Date:         ${p.Date || 'N/A'}\n`;
+            text += "==============================================================================\n\n";
+
+            text += "MEDICATIONS LIST:\n";
+            text += "------------------------------------------------------------------------------\n";
+            text += "| Medication           | Dosage      | Frequency    | Duration     |\n";
+            text += "|----------------------|-------------|--------------|--------------|\n";
+
+            (currentData.Prescription_info || []).forEach(m => {
+                const med = (m.medications || "").padEnd(20).substring(0, 20);
+                const dos = (m.Dosage || "").padEnd(11).substring(0, 11);
+                const freq = (m.Frequency || "").padEnd(12).substring(0, 12);
+                const dur = (m.duration || m.Duration || "").padEnd(12).substring(0, 12);
+                text += `| ${med} | ${dos} | ${freq} | ${dur} |\n`;
+            });
+            text += "------------------------------------------------------------------------------\n";
+
+            const blob = new Blob([text], {type:'text/plain'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = "MediGrid_Report.txt";
+            a.click();
+        }
+
+        function toggleChat() { document.getElementById('chatPopup').classList.toggle('active'); }
+        async function sendChat() {
+            const inp = document.getElementById('chatInput'); const val = inp.value; if(!val) return;
+            const box = document.getElementById('chatBox'); box.innerHTML += `<div class="msg user">${val}</div>`;
+            inp.value = ''; box.scrollTop = box.scrollHeight;
+            try {
+                const res = await fetch("http://127.0.0.1:8000/chat", { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ message: val }) });
+                const data = await res.json(); box.innerHTML += `<div class="msg bot">${data.response}</div>`;
+                box.scrollTop = box.scrollHeight;
+            } catch(e) { box.innerHTML += `<div class="msg bot">Error.</div>`; }
+        }
+        document.getElementById('chatInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') sendChat(); });
+    </script>
+</body>
+</html>
