@@ -6,3 +6,8 @@ fastapi
 fastapi[standard]
 uvicorn
 pydantic
+langchain-google-genai
+langchain-core
+langchain
+pydantic
+Pillow
