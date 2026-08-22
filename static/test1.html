@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MediGrid AI</title>
+    <title>MedAi</title>
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     
@@ -11,13 +11,19 @@
         /* --- VARIABLES & RESET --- */
         :root {
             --bg-color: #ffffff;
-            --sidebar-bg: #f8f9fb;
-            --primary-color: #2db5b0; /*#ff4b4b*/
-            --teal-color: #00838f; 
-            --blue-btn: #2196f3; 
-            --cyan-btn: #00acc1;
-            --text-color: #262730;
-            --border-color: #e0e0e0;
+            --sidebar-bg: #f6f9fa;
+            --primary-color: #1a9c8f;
+            --primary-dark: #0f766e;
+            --teal-color: #00838f;
+            --blue-btn: #2563eb;
+            --cyan-btn: #0891b2;
+            --text-color: #1f2430;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --shadow-soft: 0 4px 14px rgba(15, 23, 42, 0.06);
+            --shadow-strong: 0 8px 24px rgba(15, 23, 42, 0.12);
         }
         * { box-sizing: border-box; }
         body {
@@ -33,23 +39,34 @@
         /* --- SIDEBAR --- */
         .sidebar {
             width: 300px;
-            background-color: var(--sidebar-bg);
+            background: linear-gradient(180deg, var(--sidebar-bg) 0%, #eef3f4 100%);
             padding: 3rem 1.5rem;
             height: 100%;
-            border-right: 1px solid #eee;
+            border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
             gap: 2rem;
             flex-shrink: 0;
         }
-        .sidebar-title { font-size: 1.5rem; font-weight: 700; color: #262730; display: flex; align-items: center; gap: 0.5rem; }
-        .sidebar h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: #444; }
-        .info-box { background: #e3f2fd; color: #0d47a1; padding: 1rem; border-radius: 6px; font-size: 0.9rem; margin-bottom: 1rem; }
-        .location-btn { 
-            background: var(--blue-btn); color: white; border: none; width: 100%; padding: 0.8rem; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;
+        .sidebar-title {
+            font-size: 1.6rem; font-weight: 700; color: var(--text-color);
+            display: flex; align-items: center; gap: 0.5rem;
+            letter-spacing: -0.02em;
         }
-        .location-btn:hover { opacity: 0.9; }
-        .location-btn.active { background-color: #2e7d32; } 
+        .sidebar h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.5rem; color: #374151; letter-spacing: 0.01em; }
+        .info-box {
+            background: #e6f4f7; color: #0d5b66;
+            padding: 1rem; border-radius: var(--radius-md);
+            font-size: 0.88rem; margin-bottom: 1rem; line-height: 1.5;
+        }
+        .location-btn {
+            background: var(--blue-btn); color: white; border: none; width: 100%;
+            padding: 0.85rem; border-radius: var(--radius-md); cursor: pointer;
+            font-weight: 600; display: flex; align-items: center; justify-content: center;
+            gap: 8px; transition: all 0.2s; box-shadow: var(--shadow-soft);
+        }
+        .location-btn:hover { opacity: 0.92; transform: translateY(-1px); }
+        .location-btn.active { background-color: #15803d; }
 
         /* --- MAIN CONTENT CONTAINER --- */
         .main-content {
@@ -64,13 +81,13 @@
 
         /* --- TOP SECTION --- */
         .top-section { margin-bottom: 2rem; text-align: center; }
-        .hero-title { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; color: #262730; }
-        .sub-header { color: #666; margin-bottom: 1.5rem; }
+        .hero-title { font-size: 2.6rem; font-weight: 700; margin-bottom: 0.6rem; color: var(--text-color); letter-spacing: -0.03em; }
+        .sub-header { color: var(--text-muted); margin-bottom: 1.5rem; font-size: 1rem; }
 
         .upload-zone {
-            border: 2px dashed #00acc1;
-            background: #f0f8ff;
-            border-radius: 12px;
+            border: 2px dashed var(--primary-color);
+            background: #f0fbfa;
+            border-radius: var(--radius-lg);
             padding: 2rem;
             text-align: center;
             cursor: pointer;
@@ -80,35 +97,40 @@
             margin-left: auto;
             margin-right: auto;
         }
-        .upload-zone:hover { background: #e0f7fa; border-color: #00838f; }
-        .upload-content { display: flex; align-items: center; justify-content: center; gap: 1rem; color: #555; }
-        .browse-btn { background: white; border: 1px solid #ccc; padding: 8px 16px; border-radius: 4px; font-weight: 600; cursor: pointer; }
+        .upload-zone:hover { background: #e2f6f3; border-color: var(--primary-dark); box-shadow: var(--shadow-soft); }
+        .upload-content { display: flex; align-items: center; justify-content: center; gap: 1rem; color: #4b5563; }
+        .browse-btn { background: white; border: 1px solid #d1d5db; padding: 8px 18px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.15s; }
+        .browse-btn:hover { border-color: var(--primary-color); color: var(--primary-dark); }
 
         .full-width-btn {
-            background: var(--cyan-btn); color: white; border: none; padding: 12px; width: 100%; max-width: 800px; border-radius: 6px; font-weight: 600; cursor: pointer; margin: 0 auto; display: block;
+            background: var(--cyan-btn); color: white; border: none; padding: 12px;
+            width: 100%; max-width: 800px; border-radius: var(--radius-md); font-weight: 600;
+            cursor: pointer; margin: 0 auto; display: block; transition: 0.2s; box-shadow: var(--shadow-soft);
         }
+        .full-width-btn:hover { opacity: 0.92; transform: translateY(-1px); }
 
         /* --- WAITING STATE --- */
-        .waiting-state { text-align: center; color: #999; margin-top: 3rem; transition: opacity 0.3s; }
-        .waiting-state h3 { font-size: 1.5rem; margin-bottom: 0.5rem; color: #bbb; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .waiting-state { text-align: center; color: #9ca3af; margin-top: 3rem; transition: opacity 0.3s; }
+        .waiting-state h3 { font-size: 1.5rem; margin-bottom: 0.5rem; color: #c1c7d0; display: flex; align-items: center; justify-content: center; gap: 10px; }
 
         /* --- RESULTS --- */
         .results-container {
-            display: none; 
-            border-top: 1px solid #eee;
+            display: none;
+            border-top: 1px solid var(--border-color);
             padding-top: 2rem;
             height: 100%;
             animation: slideUp 0.4s ease;
-            padding-bottom: 80px; 
+            padding-bottom: 80px;
         }
 
         .split-layout { display: flex; gap: 2rem; height: 500px; }
-        .col-header { font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; color: #333; display: flex; align-items: center; gap: 8px; }
+        .col-header { font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem; color: #1f2430; display: flex; align-items: center; gap: 8px; }
 
         /* Left: Source Image */
         .left-col { flex: 1; display: flex; flex-direction: column; min-width: 350px; }
-        .img-viewer { 
-            flex: 1; background: #222; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        .img-viewer {
+            flex: 1; background: #1e1e24; border-radius: var(--radius-lg); display: flex;
+            align-items: center; justify-content: center; overflow: hidden; box-shadow: var(--shadow-strong);
             position: relative; cursor: zoom-in;
         }
         .img-viewer img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform 0.3s; }
@@ -116,23 +138,29 @@
         .zoom-hint { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.6); color: white; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; pointer-events: none; }
 
         /* Right: Analysis Tab */
-        .right-col { 
-            flex: 1.2; background: white; border: 1px solid #eee; border-radius: 8px; display: flex; flex-direction: column; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+        .right-col {
+            flex: 1.2; background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg);
+            display: flex; flex-direction: column; position: relative; box-shadow: var(--shadow-soft);
         }
 
-        .panel-nav { display: flex; border-bottom: 1px solid #eee; padding: 0 1rem; background: #fafafa; border-radius: 8px 8px 0 0; }
-        .nav-btn { background: none; border: none; padding: 1rem; font-weight: 600; color: #666; cursor: pointer; border-bottom: 3px solid transparent; }
+        .panel-nav { display: flex; border-bottom: 1px solid var(--border-color); padding: 0 1rem; background: #fafbfc; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+        .nav-btn { background: none; border: none; padding: 1rem; font-weight: 600; color: #6b7280; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.15s; }
         .nav-btn.active { color: var(--primary-color); border-bottom-color: var(--primary-color); background: white; }
-        
+        .nav-btn:hover:not(.active) { color: #374151; }
+
         .panel-content { flex: 1; padding: 1.5rem; overflow-y: auto; }
-        
-        .loader-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; border-radius: 8px; }
+
+        .loader-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; border-radius: var(--radius-lg); }
         .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; }
-        th { text-align: left; padding: 10px; background: #f9f9f9; color: #555; }
-        td { padding: 10px; border-bottom: 1px solid #eee; }
-        .patient-card { background: #f5f5f5; padding: 1rem; border-radius: 6px; display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 1rem; font-size: 0.9rem; }
+        th { text-align: left; padding: 10px; background: #f9fafb; color: #4b5563; font-weight: 700; }
+        td { padding: 10px; border-bottom: 1px solid var(--border-color); }
+        .patient-card {
+            background: #f3f6f7; padding: 1rem; border-radius: var(--radius-md);
+            display: flex; justify-content: space-between; font-weight: 600;
+            margin-bottom: 1rem; font-size: 0.9rem; border: 1px solid var(--border-color);
+        }
 
         /* --- FULLSCREEN --- */
         .fullscreen-overlay {
@@ -145,23 +173,36 @@
 
         /* --- MODAL --- */
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
-        .modal-content { background: white; margin: 5% auto; padding: 2rem; width: 80%; max-height: 80vh; overflow-y: auto; border-radius: 8px; position: relative; }
-        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: #666; }
+        .modal-content { background: white; margin: 5% auto; padding: 2rem; width: 80%; max-height: 80vh; overflow-y: auto; border-radius: var(--radius-lg); position: relative; box-shadow: var(--shadow-strong); }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: #6b7280; }
 
         /* --- CHAT --- */
-        .chat-widget-btn { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; background-color: var(--primary-color); color: white; border-radius: 50%; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2000; transition: transform 0.2s; }
-        .chat-widget-btn:hover { transform: scale(1.1); }
-        .chat-popup { position: fixed; bottom: 100px; right: 25px; width: 350px; height: 500px; background-color: white; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); display: flex; flex-direction: column; z-index: 1999; overflow: hidden; border: 1px solid #eee; opacity: 0; pointer-events: none; transform: translateY(20px); transition: all 0.3s ease; }
+        .chat-widget-btn {
+            position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white; border-radius: 50%; border: none; box-shadow: var(--shadow-strong);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            z-index: 2000; transition: transform 0.2s;
+        }
+        .chat-widget-btn:hover { transform: scale(1.08); }
+        .chat-popup {
+            position: fixed; bottom: 100px; right: 25px; width: 350px; height: 500px;
+            background-color: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-strong);
+            display: flex; flex-direction: column; z-index: 1999; overflow: hidden;
+            border: 1px solid var(--border-color); opacity: 0; pointer-events: none;
+            transform: translateY(20px); transition: all 0.3s ease;
+        }
         .chat-popup.active { opacity: 1; pointer-events: auto; transform: translateY(0); }
-        .chat-header { background: var(--primary-color); color: white; padding: 1rem; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
-        .chat-body { flex: 1; padding: 1rem; overflow-y: auto; background-color: #f9f9f9; display: flex; flex-direction: column; gap: 10px; }
-        .chat-footer { padding: 0.8rem; border-top: 1px solid #eee; background-color: white; display: flex; gap: 0.5rem; }
-        .chat-input { flex: 1; border: 1px solid #ddd; border-radius: 20px; padding: 8px 15px; outline: none; }
+        .chat-header { background: var(--primary-color); color: white; padding: 1rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+        .chat-body { flex: 1; padding: 1rem; overflow-y: auto; background-color: #f9fafb; display: flex; flex-direction: column; gap: 10px; }
+        .chat-footer { padding: 0.8rem; border-top: 1px solid var(--border-color); background-color: white; display: flex; gap: 0.5rem; }
+        .chat-input { flex: 1; border: 1px solid #d1d5db; border-radius: 20px; padding: 8px 15px; outline: none; }
+        .chat-input:focus { border-color: var(--primary-color); }
         .msg { padding: 8px 12px; border-radius: 15px; max-width: 85%; font-size: 0.9rem; line-height: 1.4; }
         .msg.bot { background: #e8f0fe; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
         .msg.user { background: var(--primary-color); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
 
-        .toast { position: fixed; top: 20px; right: 20px; background: #333; color: white; padding: 12px 20px; border-radius: 4px; animation: fadeIn 0.3s; z-index: 3000; }
+        .toast { position: fixed; top: 20px; right: 20px; background: #1f2430; color: white; padding: 12px 20px; border-radius: 8px; box-shadow: var(--shadow-strong); animation: fadeIn 0.3s; z-index: 3000; }
         .hidden { display: none; }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes spin { 100% { transform: rotate(360deg); } }
@@ -174,7 +215,7 @@
     <input type="file" id="hiddenFileInput" accept="image/*" style="display:none;">
 
     <div class="sidebar">
-        <div class="sidebar-title">✚ MediGrid AI</div>
+        <div class="sidebar-title">✚ MedAi</div>
         
         <div>
             <h3>📍 Location Service</h3>
@@ -190,13 +231,12 @@
                 1. Enable location (must for nearby pharmacies).<br>
                 2. Upload a prescription image.<br>
                 3. AI extracts medicines clearly.<br>
-                4. Download report
-                5. Save to Database for chat with ai assistant.
+                4. Download report.<br>
+                5. Save to database to chat with the AI assistant.
             </div>
-            <h3>ℹ️ Desclimer</h3>
-            <div class="info-box" style="background:none; border:1px solid #ffffff; color:#555;">
-                This AI Application provide informational support only and do not substitute for professional medical advice, diagnosis, or treatment.”.<br>
-                
+            <h3>ℹ️ Disclaimer</h3>
+            <div class="info-box" style="background:none; border:1px solid #e5e7eb; color:#555;">
+                This AI application provides informational support only and does not substitute for professional medical advice, diagnosis, or treatment.
             </div>
         </div>
     </div>
@@ -204,15 +244,15 @@
     <div class="main-content">
 
         <div class="top-section">
-            <div class="hero-title">✚ MediGrid AI</div>
-            <div class="sub-header">Transform handwritten tablets prescriptions into digital medical insights.</div>
+            <div class="hero-title">✚ MedAi</div>
+            <div class="sub-header">Transform handwritten prescriptions into clear, structured medical insights.</div>
 
             <div class="upload-zone" onclick="triggerUpload()">
                 <div class="upload-content">
-                    <span class="material-icons" style="font-size: 2rem; color: #ccc;">cloud_upload</span>
+                    <span class="material-icons" style="font-size: 2rem; color: #9ca3af;">cloud_upload</span>
                     <div>
-                        <div style="font-weight:600; color:#333;">Drag and drop file here</div>
-                        <div style="font-size:0.8rem; color:#888; margin-top:5px;">Limit 200MB • PNG, JPG, JPEG</div>
+                        <div style="font-weight:700; color:#1f2430;">Drag and drop file here</div>
+                        <div style="font-size:0.8rem; color:#9ca3af; margin-top:5px;">Limit 200MB • PNG, JPG, JPEG</div>
                     </div>
                     <button class="browse-btn">Upload files</button>
                 </div>
@@ -230,7 +270,7 @@
             <div class="split-layout">
                 
                 <div class="left-col">
-                    <div class="col-header"><span class="material-icons" style="color:#00acc1">image</span> Source Images</div>
+                    <div class="col-header"><span class="material-icons" style="color:#00acc1">image</span> Source Image</div>
                     <div class="img-viewer" onclick="openFullscreen()">
                         <img id="dashboardImg" src="" alt="Source Prescription">
                         <div class="zoom-hint"><span class="material-icons" style="font-size:0.8rem; vertical-align:middle;">zoom_in</span> Click to Zoom</div>
@@ -238,11 +278,11 @@
                 </div>
 
                 <div class="right-col">
-                    <div class="col-header" style="padding: 0 1rem; margin-top: 1rem;"><span class="material-icons" style="color:#ff4b4b">analytics</span> Analysis Tab</div>
+                    <div class="col-header" style="padding: 0 1rem; margin-top: 1rem;"><span class="material-icons" style="color:#ff4b4b">analytics</span> Analysis</div>
 
                     <div class="loader-overlay" id="dashboardLoader">
                         <div class="spinner"></div>
-                        <p style="margin-top:10px; font-weight:600; color:#555;">Analyzing Prescription...</p>
+                        <p style="margin-top:10px; font-weight:600; color:#555;">Analyzing prescription...</p>
                     </div>
 
                     <div class="panel-nav">
@@ -270,9 +310,9 @@
                         <div id="warningList"></div>
                     </div>
                     
-                    <div style="padding:1rem; border-top:1px solid #eee; display:flex; gap:10px; justify-content:flex-end;">
+                    <div style="padding:1rem; border-top:1px solid var(--border-color); display:flex; gap:10px; justify-content:flex-end;">
                          <button type="button" class="browse-btn" onclick="downloadText()">Download Report (.txt)</button>
-                         <button type="button" class="location-btn" style="width:auto; background:#2e7d32;" onclick="saveToDb(event)">Save to DB</button>
+                         <button type="button" class="location-btn" style="width:auto; background:#15803d;" onclick="saveToDb(event)">Save to DB</button>
                     </div>
                 </div>
 
@@ -286,11 +326,11 @@
     </button>
     <div class="chat-popup" id="chatPopup">
         <div class="chat-header">
-            <span>🤖 MediAI Support Assistant</span>
+            <span>🤖 MedAi Assistant</span>
             <span class="material-icons" style="cursor:pointer" onclick="toggleChat()">close</span>
         </div>
         <div class="chat-body" id="chatBox">
-            <div class="msg bot">Hello! I am your MediGrid assistant. How can I help you with this prescription?</div>
+            <div class="msg bot">Hello! I am your MedAi assistant. How can I help you with this prescription?</div>
         </div>
         <div class="chat-footer">
             <input type="text" id="chatInput" class="chat-input" placeholder="Ask a question...">
@@ -525,7 +565,7 @@
 
         function downloadText() {
             if(!currentData) return;
-            let text = "MEDIGRID AI REPORT\n";
+            let text = "MEDAI REPORT\n";
             text += "==============================================================================\n";
             const p = currentData.patient_info || {};
             text += `Patient Name: ${p.patient_name || p.Name || 'N/A'}\n`;
@@ -550,7 +590,7 @@
             const blob = new Blob([text], {type:'text/plain'});
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = "MediGrid_Report.txt";
+            a.download = "MedAi_Report.txt";
             a.click();
         }
 
